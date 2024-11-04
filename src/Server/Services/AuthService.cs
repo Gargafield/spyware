@@ -10,6 +10,7 @@ namespace Server.Services;
 public interface IAuthService {
     public bool ValidateToken(string token, out string username);
     public string CreateToken(string username);
+    public bool RemoveToken(string token);
 }
 
 public class AuthService : IAuthService {
@@ -23,6 +24,10 @@ public class AuthService : IAuthService {
 
     public bool ValidateToken(string token, out string username) {
         return _tokenStore.TryGetValue(token, out username);
+    }
+
+    public bool RemoveToken(string token) {
+        return _tokenStore.Remove(token);
     }
 
     public string CreateToken(string username) {

@@ -42,7 +42,7 @@ where V : notnull {
             }
             Remove(key);
         }
-        value = default;
+        value = default!;
         return false;
     }
 

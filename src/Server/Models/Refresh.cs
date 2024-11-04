@@ -5,5 +5,5 @@ namespace Server.Models;
 
 public class RefreshModel {
     [Required]
-    public string AccessToken { get; set; }
+    public required string AccessToken { get; set; }
 }

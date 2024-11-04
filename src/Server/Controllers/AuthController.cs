@@ -1,17 +1,12 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Server.Models;
 using Server.Services;
-using Server.Utils;
 
 namespace Server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/auth")]
 public class AuthController : ControllerBase
 {
     private IAuthService _authService;
@@ -22,8 +17,6 @@ public class AuthController : ControllerBase
         _authService = authService;
         _logger = logger;
     }
-
-    
 
     [HttpPost("login", Name = "Login")]
     [AllowAnonymous]
@@ -40,13 +33,23 @@ public class AuthController : ControllerBase
         return Unauthorized();
     }
 
-    [HttpPost("refresh", Name = "Refresh")]
+    [HttpPut("login", Name = "Refresh")]
     [AllowAnonymous]
     public IActionResult Refresh(RefreshModel refreshModel) {
         if (_authService.ValidateToken(refreshModel.AccessToken, out var username)) {
             return Ok(new { AccessToken = SetCookie(username) });
         }
 
+        return Unauthorized();
+    }
+
+    [HttpDelete("login", Name = "Logout")]
+    [Authorize]
+    public IActionResult Logout() {
+        if (_authService.RemoveToken(Request.Cookies["access_token"] ?? "")) {
+            Response.Cookies.Delete("access_token");
+            return Ok();
+        }
         return Unauthorized();
     }
 

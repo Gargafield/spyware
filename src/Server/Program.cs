@@ -1,9 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Server.Auth;
 using Server.Services;
+using Server.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddRazorPages();
+
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+builder.Services.AddSingleton<ISocketService, SocketService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 
 var configuration = new ConfigurationBuilder()
@@ -32,14 +39,17 @@ builder.Services.AddAuthorization(options => {
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseWebSockets(new WebSocketOptions() {
+    KeepAliveInterval = TimeSpan.FromMinutes(2),
+});
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+app.UseAntiforgery();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.UseAuthentication();
 app.UseAuthorization();

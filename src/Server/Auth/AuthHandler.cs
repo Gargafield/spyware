@@ -16,9 +16,13 @@ public class AuthHandler : AuthenticationHandler<AuthSchemeOptions>
         _authService = authService;
     }
 
+    public static string? GetToken(HttpRequest request) {
+        return (string?)request.Headers["Authorization"] ?? request.Cookies["access_token"];
+    }
+
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        string? token = (string?)Request.Headers["Authorization"] ?? Request.Cookies["access_token"];
+        string? token = GetToken(Request);
         if (string.IsNullOrWhiteSpace(token)) {
             return AuthenticateResult.Fail("Authorization header is empty");
         }
