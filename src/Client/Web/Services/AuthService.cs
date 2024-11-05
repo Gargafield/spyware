@@ -5,6 +5,7 @@ using Shared.Models;
 namespace Web.Services;
 
 public interface IAuthService {
+    Task<bool> IsAuthenticated();
     Task<LoginResultModel> LoginAsync(LoginModel model);
     Task LogoutAsync();
 }
@@ -20,12 +21,22 @@ public class AuthService : IAuthService {
         _authProvider = authProvider;
     }
 
+    public async Task<bool> IsAuthenticated() {
+        var state = await _authProvider.GetAuthenticationStateAsync();
+        var identity = state.User.Identity;
+        return identity != null && identity.IsAuthenticated;
+    }
+
     public async Task<LoginResultModel> LoginAsync(LoginModel model) {
         var response = await _httpService.PostAsync<LoginResultModel>("api/auth/login", model);
 
         if (response!.Succeeded) {
             await _localStorageService.SetItem("token", response.Token);
-            ((AuthProvider)_authProvider).LoggedIn(response.Token);
+
+            var user = await _httpService.GetAsync<User>("api/user");
+            await _localStorageService.SetItem("user", user);
+
+            ((AuthProvider)_authProvider).LoggedIn(user!);
         }
 
         return response!;
@@ -33,7 +44,7 @@ public class AuthService : IAuthService {
 
     public async Task LogoutAsync() {
         await _httpService.DeleteAsync("api/auth/login");
-        await _localStorageService.RemoveItem("token");
+        await _localStorageService.Clear();
         ((AuthProvider)_authProvider).LoggedOut();
     }
 }

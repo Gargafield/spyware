@@ -1,0 +1,89 @@
+@page "/teacher-dashboard"
+@attribute [Authorize (Roles = "Teacher")]
+@using Microsoft.AspNetCore.Authorization
+@using Shared.Models
+@using Web.Services
+@inject IClassService ClassService
+@inject IConnectionService ConnectionService
+
+<h1>Teacher Dashboard</h1>
+
+<p>Welcome to the teacher dashboard!</p>
+<p>Here you can view and manage your students.</p>
+
+<!-- Add a table to display the students -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Student ID</th>
+            <th>Username</th>
+            <th>Hand Raised</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Class == null)
+        {
+            <tr>
+                <td colspan="3">No students in class</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var student in Class.Students)
+            {
+                <tr>
+                    <td>@student.Id</td>
+                    <td>@student.Username</td>
+                    <td>@(HandsRaised.Contains(student.Id) ? "Yes" : "No")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<!-- Add a button to turn of the screen -->
+<button @onclick="toggleScreenStatus" class="btn btn-danger">
+    @if (IsScreenOn)
+    {
+        <span>Turn Off Screens</span>
+    }
+    else
+    {
+        <span>Turn On Screens</span>
+    }
+</button>
+
+@code {
+    private Class Class { get; set; } = default!;
+    private List<int> HandsRaised = new();
+    private bool IsScreenOn = true;
+
+    protected override async Task OnInitializedAsync() {
+        Class = await ClassService.GetCurrentClassAsync();
+        ConnectionService.OnStudentAdded += HandleStudentAdded;
+        ConnectionService.OnHandRaised += HandleHandRaised;
+        ConnectionService.OnHandLowered += HandleHandLowered;
+        
+        _ = ConnectionService.ConnectAsync();
+    }
+
+    private void HandleHandRaised(int studentId) {
+        HandsRaised.Add(studentId);
+        StateHasChanged();
+    }
+
+    private void HandleHandLowered(int studentId) {
+        HandsRaised.Remove(studentId);
+        StateHasChanged();
+    }
+
+    private void HandleStudentAdded(Student student) {
+        Class.Students.Add(student);
+        StateHasChanged();
+    }
+
+    private async Task toggleScreenStatus() {
+        IsScreenOn = !IsScreenOn;
+        await ConnectionService.SendScreenStatusAsync(IsScreenOn);
+    }
+}

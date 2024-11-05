@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Auth;
-using Server.Models;
 using Server.Services;
 using Shared.Models;
 
@@ -12,12 +11,11 @@ namespace Server.Controllers;
 public class AuthController : ControllerBase
 {
     private IAuthService _authService;
-    private readonly ILogger<AuthController> _logger;
+    private IUserService _userService;
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
-    {
+    public AuthController(IAuthService authService, IUserService userService) {
         _authService = authService;
-        _logger = logger;
+        _userService = userService;
     }
 
     [HttpGet("login", Name = "Check")]
@@ -36,7 +34,8 @@ public class AuthController : ControllerBase
 
         // Check if user exists
         // TODO: Implement Lectio login
-        bool auth = loginModel.Username == "admin" && loginModel.Password == "admin";
+        bool auth = loginModel.Username == loginModel.Password
+            && _userService.DoesUserExist(loginModel.Username);
 
         if (auth) {
             return Ok(new LoginResultModel() {

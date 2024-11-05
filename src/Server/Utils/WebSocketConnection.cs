@@ -4,22 +4,20 @@ using System.Text;
 namespace Server.Utils;
 
 public interface IWebSocketConnection {
-    public string Username { get; set; }
     public WebSocket WebSocket { get; set; }
-    public event EventHandler<string> OnMessage;
+    public event Action<IWebSocketConnection, string> OnMessage;
     public Task StartListening();
+    public Task Send(byte[] message);
 }
 
 public class WebSocketConnection : IWebSocketConnection, IDisposable {
-    public string Username { get; set; }
     public WebSocket WebSocket { get; set; }
 
     private CancellationTokenSource _cancellationTokenSource;
 
-    public event EventHandler<string> OnMessage = default!;
+    public event Action<IWebSocketConnection, string> OnMessage = default!;
 
-    public WebSocketConnection(string username, WebSocket webSocket) {
-        Username = username;
+    public WebSocketConnection(WebSocket webSocket) {
         WebSocket = webSocket;
         _cancellationTokenSource = new CancellationTokenSource();
     }
@@ -29,8 +27,6 @@ public class WebSocketConnection : IWebSocketConnection, IDisposable {
         WebSocketReceiveResult result;
 
         while (WebSocket.State == WebSocketState.Open && !_cancellationTokenSource.Token.IsCancellationRequested) {
-            
-            
             try {
                 result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), _cancellationTokenSource.Token);
             }

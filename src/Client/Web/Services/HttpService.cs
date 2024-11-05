@@ -60,11 +60,6 @@ public class HttpService : IHttpService {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await _localStorage.GetItem<string>("token"));
 
         var response = await _client.SendAsync(request);
-        if (!response.IsSuccessStatusCode) {
-            var message = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException(message);
-        }
-        
         return response;
     }
 }

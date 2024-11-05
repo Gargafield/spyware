@@ -1,10 +1,44 @@
 ﻿@page "/"
-@using Microsoft.AspNetCore.Authorization;
-@attribute [AllowAnonymous]
+@using Microsoft.AspNetCore.Components.Authorization
+@using Web.Services
+@using Shared.Models
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+@code {
+    private bool isLoggedIn;
+    private bool isTeacher;
 
-Welcome to your new app.
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isLoggedIn = authState.User.Identity.IsAuthenticated;
 
+        if (isLoggedIn)
+        {
+            isTeacher = authState.User.IsInRole("Teacher");
+        }
+    }
+}
+
+@if (isLoggedIn)
+{
+    if (isTeacher)
+    {
+        <h3>Welcome, Teacher!</h3>
+        <a href="/teacher-dashboard">Go to Teacher Dashboard</a>
+    }
+    else
+    {
+        <h3>Welcome, Student!</h3>
+        <a href="/student-dashboard">Go to Student Dashboard</a>
+    }
+}
+else
+{
+    <h3>Welcome, Guest!</h3>
+    <a href="/login">Login</a>
+}

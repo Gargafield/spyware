@@ -64,8 +64,6 @@ public class ApiClient {
 
     public async Task<ClientWebSocket> ConnectAsync() {
         var socket = new ClientWebSocket();
-        socket.Options.Cookies = cookieContainer;
-        socket.Options.SetRequestHeader("Authorization", httpClient.DefaultRequestHeaders.Authorization!.Parameter);
         await socket.ConnectAsync(new Uri($"{WS_URL}/api/connect"), CancellationToken.None)
             .ConfigureAwait(false);
         return socket;

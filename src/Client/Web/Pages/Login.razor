@@ -30,11 +30,19 @@
     private LoginModel loginModel = new();
     private string? errorMessage = null;
 
+    protected override async Task OnInitializedAsync() {
+        // Redirect to home page if user is already logged in
+        if (await AuthService.IsAuthenticated()) {
+            Navigation.NavigateTo("/");
+        }
+    }
+
     private async Task HandleValidSubmit()
     {
         try
         {
             var result = await AuthService.LoginAsync(loginModel);
+
             if (!result.Succeeded) {
                 errorMessage = result.Message;
                 return;
@@ -45,7 +53,7 @@
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
+            errorMessage = ex.ToString();
         }
     }
 }

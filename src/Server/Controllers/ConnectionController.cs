@@ -1,14 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Server.Auth;
-using Server.Models;
 using Server.Services;
-using Server.Utils;
 
 namespace Server.Controllers;
 
@@ -32,17 +25,8 @@ public class ConnectionController : ControllerBase
         var context = ControllerContext.HttpContext;
 
         if (context.WebSockets.IsWebSocketRequest) {
-            var token = AuthHandler.GetToken(Request);
-
-            if (!_authService.ValidateToken(token!, out string username))
-                return new StatusCodeResult((int) HttpStatusCode.Unauthorized);
-            
-            if (_socketService.TryGetConnection(username, out WebSocketConnection socket)) {
-                socket.Terminate();
-            }
-
             var websocket = await context.WebSockets.AcceptWebSocketAsync();
-            await _socketService.HandleConnection(websocket, username).ConfigureAwait(false);
+            await _socketService.HandleConnection(websocket).ConfigureAwait(false);
 
             return new EmptyResult();
         }

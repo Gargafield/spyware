@@ -14,6 +14,8 @@ builder.Services.AddSingleton(sp => {
 builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
+builder.Services.AddSingleton<IClassService, ClassService>();
+builder.Services.AddSingleton<IConnectionService, ConnectionService>();
 builder.Services.AddSingleton<AuthenticationStateProvider, AuthProvider>();
 
 builder.Services.AddAuthorizationCore();

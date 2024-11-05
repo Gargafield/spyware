@@ -1,5 +1,6 @@
 
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
 using Shared.Models;
 using Web.Services;
@@ -20,13 +21,14 @@ public class AuthProvider : AuthenticationStateProvider
 
     private async Task<bool> IsLoggedIn() {
         
-        if (await _localStorage.ContainsKey("token")) {
+        if (await _localStorage.ContainsKey("token")
+            && await _localStorage.ContainsKey("user")) {
             try {
                 var response = await _httpService.GetAsync<LoginResultModel>("api/auth/login");
                 return response!.Succeeded;
             }
             catch (Exception) {
-                await _localStorage.RemoveItem("token");
+                await _localStorage.Clear();
             }
         }
 
@@ -35,25 +37,27 @@ public class AuthProvider : AuthenticationStateProvider
 
 
     private AuthenticationState _anonymous() => new(new ClaimsPrincipal(new ClaimsIdentity()));
-    private AuthenticationState _authenticated(string token) => new(new ClaimsPrincipal(new ClaimsIdentity([
-        new Claim(ClaimTypes.Name, token),
-        new Claim(ClaimTypes.Role, "user")]
+    private AuthenticationState _authenticated(User user) {
+        if (user == null)
+            return _anonymous();
+
+        return new(new ClaimsPrincipal(new ClaimsIdentity([
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Role, user.Role)]
         , "jwt")));
+    } 
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync() {
         if (await IsLoggedIn()) {
-            Console.WriteLine("User is logged in");
-            var token = await _localStorage.GetItem<string>("token");
-            return _authenticated(token);
+            var user = await _localStorage.GetItem<User>("user");
+            return _authenticated(user);
         }
 
-        Console.WriteLine("User is not logged in");
         return _anonymous();
     }
 
-    public void LoggedIn(string token) {
-        Console.WriteLine("User logged in");
-        NotifyAuthenticationStateChanged(Task.FromResult(_authenticated(token)));
+    public void LoggedIn(User user) {
+        NotifyAuthenticationStateChanged(Task.FromResult(_authenticated(user)));
     }
 
     public void LoggedOut() {
