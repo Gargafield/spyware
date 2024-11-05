@@ -1,7 +1,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Server.Models;
+namespace Shared.Models;
 
 public class RefreshModel {
     [Required]

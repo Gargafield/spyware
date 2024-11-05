@@ -1,0 +1,51 @@
+@page "/login"
+@using Shared.Models
+@using Web.Services
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+
+<EditForm Model="loginModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="username">Username</label>
+        <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+    private string? errorMessage = null;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var result = await AuthService.LoginAsync(loginModel);
+            if (!result.Succeeded) {
+                errorMessage = result.Message;
+                return;
+            }
+
+            // Cookies are automatically stored and sent with each request
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}

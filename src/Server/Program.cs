@@ -1,14 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Server.Auth;
 using Server.Services;
-using Server.Components;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddRazorPages();
-
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
 
 builder.Services.AddSingleton<ISocketService, SocketService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
@@ -37,19 +31,24 @@ builder.Services.AddAuthorization(options => {
         .Build();
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .Build()
+    ); 
+});
+
 var app = builder.Build();
 
 app.UseWebSockets(new WebSocketOptions() {
     KeepAliveInterval = TimeSpan.FromMinutes(2),
 });
 
+app.UseCors();
+
 app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
 
 app.UseAuthentication();
 app.UseAuthorization();

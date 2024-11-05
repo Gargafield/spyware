@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Web.Services
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="navbar-nav">
+        <AuthorizeView>
+            <Authorized>
+                <a class="nav-item nav-link" href="/">Home</a>
+                <a class="nav-item nav-link" href="/class">Class</a>
+                <a class="nav-item nav-link" href="/logout">Logout</a>
+            </Authorized>
+            <NotAuthorized>
+                <a class="nav-item nav-link" href="/login">Login</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</nav>

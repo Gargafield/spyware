@@ -1,0 +1,25 @@
+
+@page "/logout"
+@using Web.Services
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+
+<h3>Logging out...</h3>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try {
+
+            await AuthService.LogoutAsync();
+        }
+        catch (Exception)
+        {
+            // Dont care
+        }
+        finally {
+            // Redirect to the home page or login page after logout
+            Navigation.NavigateTo("/");
+        }
+    }
+}
