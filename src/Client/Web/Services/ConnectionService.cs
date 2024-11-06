@@ -33,6 +33,8 @@ public class ConnectionService : IConnectionService {
         _configuration = configuration;
         _localStorageService = localStorageService;
         _authService = authService;
+
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
     }
 
     public async Task<Connection> ConnectAsync() {
@@ -42,7 +44,8 @@ public class ConnectionService : IConnectionService {
         var socket = new ClientWebSocket();
         var cancellationTokenSource = new CancellationTokenSource();
         
-        var uri = new Uri(_configuration["API_URL"]!.Replace("http", "ws") + "/api/connect");
+        var wsUrl = _configuration["API_URL"]!.Replace("http", "ws");
+        var uri = new Uri(wsUrl + "/api/connect");
         await socket.ConnectAsync(uri, cancellationTokenSource.Token);
 
         _connection = new Connection(socket, cancellationTokenSource);
