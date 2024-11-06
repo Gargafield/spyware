@@ -4,12 +4,14 @@ using System.Text.Json.Serialization;
 
 namespace Shared.Models;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MessageType
 {
     StudentAdded,
     HandStatus,
     ScreenStatus,
-    Auth
+    Auth,
+    Error,
 }
 
 [JsonConverter(typeof(JsonMessageConverter))]
@@ -52,17 +54,28 @@ public class AuthMessage : Message {
     public string AccessToken { get; set; }
 }
 
+public class ErrorMessage : Message {
+    [JsonPropertyName("t")]
+    public override MessageType Type => MessageType.Error;
+
+    [JsonPropertyName("message")]
+    public string Message { get; set; }
+    [JsonPropertyName("object")]
+    public object Object { get; set; }
+}
+
 public class JsonMessageConverter : JsonConverter<Message> {
     public override Message Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
         using var jsonDocument = JsonDocument.ParseValue(ref reader);
         var root = jsonDocument.RootElement;
 
-        var type = (MessageType)root.GetProperty("t").GetInt32();
+        var type = JsonSerializer.Deserialize<MessageType>(root.GetProperty("t").GetRawText(), options);
         return type switch {
             MessageType.StudentAdded => JsonSerializer.Deserialize<StudentAddedMessage>(root.GetRawText(), options)!,
             MessageType.HandStatus => JsonSerializer.Deserialize<HandStatusMessage>(root.GetRawText(), options)!,
             MessageType.ScreenStatus => JsonSerializer.Deserialize<ScreenStatusMessage>(root.GetRawText(), options)!,
             MessageType.Auth => JsonSerializer.Deserialize<AuthMessage>(root.GetRawText(), options)!,
+            MessageType.Error => JsonSerializer.Deserialize<ErrorMessage>(root.GetRawText(), options)!,
             _ => throw new JsonException()
         };
     }

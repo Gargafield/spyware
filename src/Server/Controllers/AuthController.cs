@@ -54,7 +54,10 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public IActionResult Refresh(RefreshModel refreshModel) {
         if (_authService.ValidateToken(refreshModel.AccessToken, out var username)) {
-            return Ok(new { AccessToken = SetCookie(username) });
+            return Ok(new LoginResultModel() {
+                Succeeded = true,
+                Token = SetCookie(username)
+            });
         }
 
         return Unauthorized();

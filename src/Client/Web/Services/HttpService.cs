@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Shared;
 
 namespace Web.Services;
 
@@ -37,14 +38,14 @@ public class HttpService : IHttpService {
 
     public async Task<T?> PostAsync<T>(string uri, object data) {
         var request = new HttpRequestMessage(HttpMethod.Post, uri);
-        request.Content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(Json.Serialize(data), Encoding.UTF8, "application/json");
         var response = await sendAsync(request);
         return await response.Content.ReadFromJsonAsync<T>()!;
     }
 
     public async Task<T?> PutAsync<T>(string uri, object data) {
         var request = new HttpRequestMessage(HttpMethod.Put, uri);
-        request.Content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(Json.Serialize(data), Encoding.UTF8, "application/json");
         var response = await sendAsync(request);
         return await response.Content.ReadFromJsonAsync<T>()!;
     }

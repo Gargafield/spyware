@@ -1,6 +1,7 @@
 
 using System.Text.Json;
 using Microsoft.JSInterop;
+using Shared;
 
 namespace Web.Services;
 
@@ -21,11 +22,11 @@ public class LocalStorageService : ILocalStorageService {
 
     public async Task<T> GetItem<T>(string key) {
         var value = await JSRuntime.InvokeAsync<string>("localStorage.getItem", key);
-        return JsonSerializer.Deserialize<T>(value)!;
+        return Json.Deserialize<T>(value)!;
     }
 
     public async Task SetItem<T>(string key, T value) {
-        await JSRuntime.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(value));
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", key, Json.Serialize(value));
     }
 
     public async Task RemoveItem(string key) {

@@ -45,7 +45,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseWebSockets(new WebSocketOptions() {
-    KeepAliveInterval = TimeSpan.FromMinutes(2),
+    KeepAliveInterval = TimeSpan.FromSeconds(5),
 });
 
 app.UseCors();

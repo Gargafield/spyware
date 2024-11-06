@@ -6,6 +6,7 @@ namespace Server.Services;
 public interface IClassService {
     Task<Class> GetClassAsync(int id);
     Task<Class> GetClassForTeacherAsync(int teacherId);
+    Task<Class> GetClassForStudentAsync(int studentId);
 }
 
 public class ClassService : IClassService {
@@ -40,5 +41,9 @@ public class ClassService : IClassService {
 
     public async Task<Class> GetClassForTeacherAsync(int teacherId) {
         return Classes.FirstOrDefault(c => c.TeacherId == teacherId)!;
+    }
+
+    public async Task<Class> GetClassForStudentAsync(int studentId) {
+        return Classes.FirstOrDefault(c => c.Students.Any(s => s.Id == studentId))!;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Windows;
+﻿namespace Client.Windows;
 
 partial class Form1
 {
@@ -33,7 +33,12 @@ partial class Form1
         this.passwordLabel = new Label();
         this.passwordTextBox = new TextBox();
         this.loginButton = new Button();
-        this.container = new FlowLayoutPanel();
+        this.loginPanel = new FlowLayoutPanel();
+
+        this.dashboardLabel = new Label();
+        this.logoutButton = new Button();
+        this.raiseHandButton = new Button();
+        this.dashboardPanel = new FlowLayoutPanel();
 
         this.SuspendLayout();
 
@@ -58,18 +63,43 @@ partial class Form1
         this.loginButton.Text = "Login";
         this.loginButton.Size = new System.Drawing.Size(190, 30);
         // container
-        this.container.Controls.Add(this.usernameLabel);
-        this.container.Controls.Add(this.usernameTextBox);
-        this.container.Controls.Add(this.passwordLabel);
-        this.container.Controls.Add(this.passwordTextBox);
-        this.container.Controls.Add(this.loginButton);
-        this.container.Name = "container";
-        this.container.Dock = DockStyle.Fill;
-        this.container.FlowDirection = FlowDirection.TopDown;
-        this.container.WrapContents = false;
-        this.container.MinimumSize = new System.Drawing.Size(200, 150);
+        this.loginPanel.Controls.Add(this.usernameLabel);
+        this.loginPanel.Controls.Add(this.usernameTextBox);
+        this.loginPanel.Controls.Add(this.passwordLabel);
+        this.loginPanel.Controls.Add(this.passwordTextBox);
+        this.loginPanel.Controls.Add(this.loginButton);
+        this.loginPanel.Name = "loginPanel";
+        this.loginPanel.Dock = DockStyle.Fill;
+        this.loginPanel.FlowDirection = FlowDirection.TopDown;
+        this.loginPanel.WrapContents = false;
+        this.loginPanel.MinimumSize = new System.Drawing.Size(200, 150);
+        this.loginPanel.Visible = true; // Initially visible
 
-        this.Controls.Add(this.container);
+        // dashboardLabel
+        this.dashboardLabel.AutoSize = true;
+        this.dashboardLabel.Name = "dashboardLabel";
+        this.dashboardLabel.Text = "Dashboard";
+        // logoutButton
+        this.logoutButton.Name = "logoutButton";
+        this.logoutButton.Text = "Logout";
+        this.logoutButton.Size = new System.Drawing.Size(190, 30);
+        // raiseHandButton
+        this.raiseHandButton.Name = "raiseHandButton";
+        this.raiseHandButton.Text = "Raise Hand";
+        this.raiseHandButton.Size = new System.Drawing.Size(190, 30);
+        // container
+        this.dashboardPanel.Controls.Add(this.dashboardLabel);
+        this.dashboardPanel.Controls.Add(this.logoutButton);
+        this.dashboardPanel.Controls.Add(this.raiseHandButton);
+        this.dashboardPanel.Name = "dashboardPanel";
+        this.dashboardPanel.Dock = DockStyle.Fill;
+        this.dashboardPanel.FlowDirection = FlowDirection.TopDown;
+        this.dashboardPanel.WrapContents = false;
+        this.dashboardPanel.MinimumSize = new System.Drawing.Size(200, 150);
+        this.dashboardPanel.Visible = false; // Initially hidden
+
+        this.Controls.Add(this.loginPanel);
+        this.Controls.Add(this.dashboardPanel);
 
         this.components = new System.ComponentModel.Container();
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -89,5 +119,10 @@ partial class Form1
     private TextBox passwordTextBox;
     private Button loginButton;
     // Layout container
-    private FlowLayoutPanel container;
+    private FlowLayoutPanel loginPanel;
+
+    private Label dashboardLabel;
+    private Button logoutButton;
+    private Button raiseHandButton;
+    private FlowLayoutPanel dashboardPanel;
 }

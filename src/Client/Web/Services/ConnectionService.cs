@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using Shared;
 using Shared.Models;
 
 namespace Web.Services;
@@ -46,7 +47,7 @@ public class ConnectionService : IConnectionService {
 
         _connection = new Connection(socket, cancellationTokenSource);
 
-        await _connection.SendMessageAsync(JsonSerializer.Serialize(new AuthMessage {
+        await _connection.SendMessageAsync(Json.Serialize(new AuthMessage {
             AccessToken = await _localStorageService.GetItem<string>("token")
         }));
 
@@ -59,7 +60,7 @@ public class ConnectionService : IConnectionService {
     }
 
     private async Task OnMessageReceived(string message) {
-        var messageObject = JsonSerializer.Deserialize<Message>(message);
+        var messageObject = Json.Deserialize<Message>(message);
 
         if (messageObject is StudentAddedMessage studentAddedMessage) {
             OnStudentAdded(studentAddedMessage.Student);
@@ -82,7 +83,7 @@ public class ConnectionService : IConnectionService {
         var message = new ScreenStatusMessage {
             TurnedOn = turnedOn
         };
-        var messageJson = JsonSerializer.Serialize(message);
+        var messageJson = Json.Serialize(message);
 
         await _connection.SendMessageAsync(messageJson);
     }

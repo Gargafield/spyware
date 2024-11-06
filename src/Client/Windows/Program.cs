@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Windows;
+namespace Client.Windows;
 
 static class Program
 {
